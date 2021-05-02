@@ -3,20 +3,8 @@ import os
 import socket
 from threading import Thread
 import unittest
+from peer import Peer
 
-class Peer:
-    files = {}
-
-    def __init__(self, conn, addr) -> None:
-        self.conn = conn
-        self.addr = addr[0]
-        self.port = addr[1]
-    
-    def add_files(self, name, path):
-        self.files[name] = path
-    
-    def __eq__(self, o: object) -> bool:
-        return self.addr, self.port == (o.addr, o.port)
 
 class Master:
     port = 7000
@@ -36,15 +24,9 @@ class Master:
             print(f"[LISTENING . . . ")
             print(f"[Server::: ({self.addr}")
             while self.active:
-                try:
-                    conn, addr = server.accept()
-                    thread = Thread(target=self.slave_handler, args=(conn, addr))
-                    thread.start()
-                except KeyboardInterrupt:
-                    self.active = False
-                    print("")
-                    print("Server Shutting down")
-                    print("Goodbye")
+                conn, addr = server.accept()
+                thread = Thread(target=self.slave_handler, args=(conn, addr))
+                thread.start()
 
     def stop(self) -> None:
         self.active = False

@@ -1,9 +1,10 @@
 import socket
 import os
+from peer import Peer
 
 
 class Slave:
-    master_addr = ("192.168.1.113", 7000)
+    master_addr = ("192.168.1.103", 7000)
     slave = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     connected = False
     file = dict()
