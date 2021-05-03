@@ -1,5 +1,5 @@
 # Add Peers to the network and broadcast the peer details to all peers
-import os
+import os, pickle
 import socket
 from threading import Thread
 import unittest
@@ -39,6 +39,10 @@ class Master:
         print(conn)
         print(f"[NEW CONNECTION] ip: {addr[0]}, port: {addr[1]}")
         conn.send(f"Connected to {self.addr} successfully!".encode())
+
+        # Send the Peer details to the Client
+        encode_peer = pickle.dumps(peer)
+        conn.send(encode_peer)
         
         while True:
             msg = self.receive(conn)
@@ -46,8 +50,9 @@ class Master:
                 self.register_files(conn, peer)
 
     def register_peers(self, conn, addr):
-        peer = Peer(conn, addr)
+        peer = Peer(addr)
         self.peers.append(peer)
+        conn.send("Connected to the Peer Network Successfully!".encode())
         return peer
         # Send Message to the peer confirming the connection.
         # Ask the peer to advertise the files they have available for download
@@ -55,6 +60,7 @@ class Master:
     def register_files(self, conn, peer):
         files = conn.recv(1024).decode()
         peer.files = dict(files)
+        print(peer.files)
         return True
 
     def send_broadcast(self, msg):
